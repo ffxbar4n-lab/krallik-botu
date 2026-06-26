@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 import time
-import re
 from collections import deque, defaultdict
 
 # Bot Tanımlamaları
@@ -9,18 +8,23 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
+# Prefix ve Botu Başlatma
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# Değişkenleri buraya ekliyoruz ki kod aşağıda bunları tanısın
+# Ayarlar ve Değişkenler
 user_msgs = defaultdict(lambda: deque(maxlen=10))
 join_times = deque(maxlen=20)
 settings = {"anti_link": True, "anti_spam": True, "anti_raid": True}
 LINK_REGEX = r"https?://\S+"
-    # ===== ROAST SYSTEM =====
-def roast(member):
-    return f"🤖 {member.mention} spam yaptı → kicklendi 💀"
 
-# ===== MESSAGE CONTROL =====
+# Roast Sistemi
+def roast(member):
+    return f"{member.mention} spam yaptı -> kicklendi 💀"
+
+@bot.event
+async def on_ready():
+    print(f'Bot {bot.user} olarak giriş yaptı!')
+
 @bot.event
 async def on_message(message):
     if message.author.bot:
@@ -29,51 +33,28 @@ async def on_message(message):
     uid = message.author.id
     now = time.time()
 
-    # LINK BLOCK
-    if settings["anti_link"] and re.search(LINK_REGEX, message.content):
-        try:
-            await message.delete()
-        except:
-            pass
+    # Link Engelleme
+    if settings["anti_link"] and any(x in message.content.lower() for x in ["http", "discord.gg"]):
+        await message.delete()
         return
 
-    # SPAM CHECK
+    # Spam Kontrolü
     if settings["anti_spam"]:
         user_msgs[uid].append(now)
-
-        while user_msgs[uid] and now - user_msgs[uid][0] > 4:
-            user_msgs[uid].popleft()
-
-        if len(user_msgs[uid]) >= 5:
-            try:
-                await message.author.kick(reason="spam")
-            except:
-                pass
-
+        if len(user_msgs[uid]) >= 5 and (now - user_msgs[uid][0] < 5):
+            await message.author.kick(reason="spam")
             user_msgs[uid].clear()
             await message.channel.send(roast(message.author))
+            return
 
     await bot.process_commands(message)
 
-# ===== ANTI RAID =====
 @bot.event
 async def on_member_join(member):
-    if not settings["anti_raid"]:
-        return
-
-    now = time.time()
-    join_times.append(now)
-
-    while join_times and now - join_times[0] > 10:
-        join_times.popleft()
-
-    if len(join_times) > 5:
-        try:
+    if settings["anti_raid"]:
+        join_times.append(time.time())
+        if len(join_times) > 5 and (time.time() - join_times[0] < 10):
             await member.ban(reason="anti raid")
-        except:
-            pass
 
-# ===== BOT START =====
-# ⚠️ KEKE BURAYA DİKKAT: Alttaki tırnakların içine sadece o gizli Bot Tokenini yapıştır. 
-# Satırın sonunda veya başında başka hiçbir şey (import os vs.) kalmasın bra!
-bot.Run("MTUyMDAyMTkxMjY5NTM0MTA1Ng.Ge7t41.IEeQzQHU-0Rv92ZinFA64wgeo82VnuBljlWdGc")
+# BOTU BAŞLAT (Buraya tokenini yapıştır)
+bot.run("MTUyMDAyMTkxMjY5NTM0MTA1Ng.Ge7t41.IEeQzQHU-0Rv92ZinFA64wgeo82VnuBljlWdGc")

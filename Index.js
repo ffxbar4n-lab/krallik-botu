@@ -76,4 +76,4 @@ async def on_member_join(member):
 # ===== BOT START =====
 # ⚠️ KEKE BURAYA DİKKAT: Alttaki tırnakların içine sadece o gizli Bot Tokenini yapıştır. 
 # Satırın sonunda veya başında başka hiçbir şey (import os vs.) kalmasın bra!
-bot.run("MTUyMDAyMTkxMjY5NTM0MTA1Ng.Ge7t41.IEeQzQHU-0Rv92ZinFA64wgeo82VnuBljlWdGc")
+bot.Run("MTUyMDAyMTkxMjY5NTM0MTA1Ng.Ge7t41.IEeQzQHU-0Rv92ZinFA64wgeo82VnuBljlWdGc")

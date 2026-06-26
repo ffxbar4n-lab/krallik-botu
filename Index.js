@@ -1,4 +1,22 @@
-# ===== ROAST SYSTEM =====
+import discord
+from discord.ext import commands
+import time
+import re
+from collections import deque, defaultdict
+
+# Bot Tanımlamaları
+intents = discord.Intents.default()
+intents.message_content = True
+intents.members = True
+
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+# Değişkenleri buraya ekliyoruz ki kod aşağıda bunları tanısın
+user_msgs = defaultdict(lambda: deque(maxlen=10))
+join_times = deque(maxlen=20)
+settings = {"anti_link": True, "anti_spam": True, "anti_raid": True}
+LINK_REGEX = r"https?://\S+"
+    # ===== ROAST SYSTEM =====
 def roast(member):
     return f"🤖 {member.mention} spam yaptı → kicklendi 💀"
 
